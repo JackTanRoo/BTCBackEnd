@@ -26,9 +26,6 @@ exports.insertUrlAddressKey = function(url, pKey, address) {
       throw err;
     } else {
       console.log("successfully saved: ", url, address, pKey);
-      dbConnection.query("SELECT * FROM UrlAddressKey;", function(err, rows, fields) {
-        console.log("this is the url inserted after insertion: ", rows);
-      });
     }
   });
 };

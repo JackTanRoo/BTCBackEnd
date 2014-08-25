@@ -12,6 +12,7 @@ var app = express();
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
 app.use(partials());
 // Parse JSON (uniform resource locators)
 app.use(bodyParser.json());
@@ -20,7 +21,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.use('/secret/*', express.static(__dirname + '/public/user'));
+// app.use('/secret/*', express.static(__dirname + '/static'));
+// app.use('/clientScript/*', express.static(__dirname + '/clientScript'));
 
 // app.use(session({
 //   secret: 'keyboard cat'
@@ -30,13 +32,10 @@ app.get('/',
   function(req, res) {
     //create the secret url
     var url = 'yoursecret@' + utils.randomUrl(14, utils.characterString) //need to do a check for uniqueness
-
-    //generate the bitcoin address
+      //generate the bitcoin address
     var keyAddress = btcUtils.pKeyAndAddressGen();
     var pKey = keyAddress[0];
     var address = keyAddress[1];
-
-    console.log("this is the url, pkey, address generated: ", url, pKey, address);
     db.insertUrlAddressKey(url, pKey, address);
     var secretUri = '/secret/' + url;
     // save to database
@@ -45,10 +44,8 @@ app.get('/',
 );
 
 app.get('/secret/*', function(req, res) {
-  res.render('index')
+  res.render('index.html')
   var secretUri = req.params[0];
-  console.log("am at secret and this is the secretUri: ", secretUri);
 });
-
-console.log('Shortly is listening on 3000');
+console.log('App is listening on 3000');
 app.listen(3000);
