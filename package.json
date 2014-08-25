@@ -1,0 +1,18 @@
+{
+  "name": "BTCBackEnd",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bitcoinjs-lib": "^1.0.2",
+    "body-parser": "^1.6.5",
+    "express": "^4.8.5",
+    "express-partials": "^0.3.0",
+    "helloblock-js": "^0.2.5"
+  }
+}
