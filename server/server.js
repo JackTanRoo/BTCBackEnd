@@ -3,7 +3,7 @@ var partials = require('express-partials');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var crypto = require('crypto');
-var utils = require('/utils');
+var utils = require('./utils/utils');
 //express server routes
 var app = express();
 
