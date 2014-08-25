@@ -7,8 +7,6 @@ exports.randomUrl = function(length, chars) {
 }
 
 exports.characterString = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-console.log(exports.randomUrl(25, exports.characterString));
-console.log(exports.randomUrl(25, exports.characterString));
 
 // // create  a new hashing url
 // var crypto = require('crypto');

@@ -1,0 +1,19 @@
+{
+  "name": "BTCBackEnd",
+  "version": "0.0.0",
+  "homepage": "https://github.com/JackTanRoo/BTCBackEnd",
+  "authors": [
+    "JackTanRoo <ordo_sagittae@hotmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.2.0"
+  }
+}
