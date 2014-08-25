@@ -4,8 +4,9 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var crypto = require('crypto');
 var utils = require('./server/utils/utils');
-var btcUtils = require('./server/utils/btcUtils')
-var db = require('./server/db')
+var btcUtils = require('./server/utils/btcUtils');
+var db = require('./server/db');
+var url = require('url');
 
 //express server routes
 var app = express();
@@ -28,14 +29,18 @@ app.use(bodyParser.urlencoded({
 //   secret: 'keyboard cat'
 // })); //set up a secret for the session to use.
 
+var pKey;
+var keyAddress;
+var address;
+
 app.get('/',
   function(req, res) {
     //create the secret url
     var url = 'yoursecret@' + utils.randomUrl(14, utils.characterString) //need to do a check for uniqueness
       //generate the bitcoin address
-    var keyAddress = btcUtils.pKeyAndAddressGen();
-    var pKey = keyAddress[0];
-    var address = keyAddress[1];
+    keyAddress = btcUtils.pKeyAndAddressGen();
+    pKey = keyAddress[0];
+    address = keyAddress[1];
     db.insertUrlAddressKey(url, pKey, address);
     var secretUri = '/secret/' + url;
     // save to database
@@ -44,8 +49,26 @@ app.get('/',
 );
 
 app.get('/secret/*', function(req, res) {
-  res.render('index.html')
+  res.render('layout')
   var secretUri = req.params[0];
 });
+
+app.get('/address', function(req, res) {
+  // var parsedUrl = url.parse(request.url, true);
+  console.log("req", req.headers.referer);
+  var refererUrl = req.headers.referer;
+  var positionOfSecret = refererUrl.indexOf('/secret/');
+  var secretUriIndex = positionOfSecret + 8;
+  var secretUri = refererUrl.slice(secretUriIndex);
+  console.log('secretUri: ', secretUri);
+  db.findAddressFromUrl(secretUri, function(err, results, fields) {
+    console.log("this is the results : ", results);
+    var btcAddress = results[0].btc_address;
+    console.log("i am the btcAddress: ", btcAddress)
+    res.end(JSON.stringify(btcAddress));
+  })
+  // var secretUri = req.params[0];
+});
+
 console.log('App is listening on 3000');
 app.listen(3000);

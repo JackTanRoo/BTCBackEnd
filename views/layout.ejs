@@ -14,24 +14,41 @@
     <h1>Hello, world!</h1>
 
     <!-- NEED TO DYNAMICALLY insert btc address here -->
-    <%- body %>
+    <p>Deposit bitcoin here: <span class='depositAddress'> Placeholder</span></p>
     <button class='btn btn-warning btn-group-lg deposit'>DEPOSIT BITCOIN HERE</button>
 
     <!--<script src="/clientScript/script.js"></script> not linking correctly-->
     <script type="text/javascript">
-    var serverUrl = 'http://localhost:3000/deposit'
-    var postRequestOfDeposit = function(url){
+    var serverUrl = 'http://localhost:3000/address'
+    var appendDepositAddress = function(address){
+      $('.depositAddress').text("").text(address);
+    }
+
+    var getAddress = function(url){
+      console.log("invoked getAddress");
       $.ajax({
-        type: "POST",
+        type: "GET",
         url: url,
-        data: data,
-        success: success,
-        dataType: dataType
+        success: function(data){
+          console.log("this is resp from /addres: ", data);
+          appendDepositAddress(data);
+        },
+        dataType: 'JSON'
       });
     }
-     $(document).ready(function(){
 
-      $('.deposit').on
+    // var postRequestOfDeposit = function(url){
+    //   $.ajax({
+    //     type: "POST",
+    //     url: url,
+    //     data: data,
+    //     success: success,
+    //     dataType: dataType
+    //   });
+    // }
+     $(document).ready(function(){
+      getAddress(serverUrl);
+      // $('.deposit').on
      })
     </script>
   </body>
