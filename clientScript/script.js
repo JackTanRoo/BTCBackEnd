@@ -17,27 +17,66 @@ var getAddress = function(url) {
   });
 }
 
-var getBalance = function(url, callback) {
+var getBalanceAndSongs = function(url, callback) {
   $.ajax({
     type: "GET",
     url: url,
     success: function(data) {
-      // console.log("this is data received: ", data);
-      data = JSON.parse(data);
       callback(data);
-      // getBalance(url, callback);
+      getBalanceAndSongs(url, callback);
     },
     dataType: 'JSON'
   });
 };
 
 $(document).ready(function() {
+  var library = new Songs(songData);
+  var app = new AppModel({
+    library: library
+  });
+  var balance;
+  var songlibrary;
+  // build a view for the top level of the whole app
+  var appView = new AppView({
+    model: app
+  });
+  // $('.wholePlayer').empty();
+  // put the view onto the screen
+  $('.wholePlayer').append(appView.render());
+
   getAddress(getAddressUrl);
-  getBalance(getBalanceUrl, function(data) {
-    console.log("this is the data: ", data);
-    if (data > 0) {
-      $('.BTCBalance').val(data);
-      $('#BTCRunningBalance').text("").text(data);
-    }
+  var gotMoney = false;
+  getBalanceAndSongs(getBalanceUrl, function(data) {
+    console.log("this is the data received in getBalanceAndSongs: ", data)
+    balance = data.balance; //balance is a number
+    if (balance > 0 && !gotMoney) {
+      $('#BTCRunningBalance').text(balance);
+      songlibrary = data.songs;
+      library = new Songs(songlibrary);
+      app = new AppModel({
+        library: library
+      });
+      // build a view for the top level of the whole app
+      appView = new AppView({
+        model: app
+      });
+      gotMoney = true;
+      $('.wholePlayer').empty();
+      $('.wholePlayer').append(appView.render());
+    } else if (balance === 0 && gotMoney === true) {
+      $('#BTCRunningBalance').text(balance);
+      songlibrary = data.songs;
+      library = new Songs(songlibrary);
+      app = new AppModel({
+        library: library
+      });
+      // build a view for the top level of the whole app
+      appView = new AppView({
+        model: app
+      });
+      gotMoney = false;
+      $('.wholePlayer').empty();
+      $('.wholePlayer').append(appView.render());
+    };
   });
 });

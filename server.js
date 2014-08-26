@@ -7,7 +7,7 @@ var utils = require('./server/utils/utils');
 var btcUtils = require('./server/utils/btcUtils');
 var db = require('./server/db');
 var url = require('url');
-
+var songs = require('./server/songData');
 //express server routes
 var app = express();
 
@@ -78,17 +78,27 @@ app.get('/balance', function(req, res) {
     var btcAddress = results[0].btc_address;
     // make a get request to HelloBlock to check balance of address
     //'n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa' has 150000 satoshis
-    btcUtils.checkBalanceOfAddress(btcAddress, function(result) {
-      // btcUtils.checkBalanceOfAddress('n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa', function(result) {
-      console.log("this is the balance: ", result)
-      res.end(JSON.stringify(result)); //send balance to the client;
-
-      // if the balance is above 0 send a cookie that allows them access the site
-
+    btcUtils.checkBalanceOfAddress(btcAddress, function(balance) {
+      // btcUtils.checkBalanceOfAddress('n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa', function(balance) {
+      console.log("this is the balance: ", balance)
+      var balanceAndSongs = {
+        balance: balance
+      };
+      // outcome is JSON of [balance, songData];
+      if (balance > 0) {
+        //if balance is 0, songData is object without URl
+        balanceAndSongs.songs = songs.paidSongs;
+      } else {
+        //if balance is >0, songData is object with URL
+        balanceAndSongs.songs = songs.unpaidSongs;
+      }
+      console.log('this is the balanceAndSongs object: ', balanceAndSongs);
+      res.end(JSON.stringify(balanceAndSongs)); //send balance to the client;
     })
     //then res.send, the balance
   });
 });
+
 app.get('/MyTunes-FinalVersion/*', function(req, res) {
   // app.get('/clientScript/*', function(req, res) {
   console.log('this is the path: ', req.path);
