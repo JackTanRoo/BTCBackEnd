@@ -11,7 +11,9 @@ var url = require('url');
 //express server routes
 var app = express();
 
-app.set('views', __dirname + '/views');
+app.set('views', __dirname + '/MyTunes-FinalVersion/2014-07-mytunes/client/');
+// app.set('views', __dirname + '/views');
+
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 app.use(partials());
@@ -49,25 +51,57 @@ app.get('/',
 );
 
 app.get('/secret/*', function(req, res) {
-  res.render('layout')
+  res.render('index.html')
   var secretUri = req.params[0];
 });
 
 app.get('/address', function(req, res) {
   // var parsedUrl = url.parse(request.url, true);
-  console.log("req", req.headers.referer);
   var refererUrl = req.headers.referer;
   var positionOfSecret = refererUrl.indexOf('/secret/');
   var secretUriIndex = positionOfSecret + 8;
   var secretUri = refererUrl.slice(secretUriIndex);
-  console.log('secretUri: ', secretUri);
   db.findAddressFromUrl(secretUri, function(err, results, fields) {
     console.log("this is the results : ", results);
     var btcAddress = results[0].btc_address;
-    console.log("i am the btcAddress: ", btcAddress)
     res.end(JSON.stringify(btcAddress));
-  })
-  // var secretUri = req.params[0];
+  });
+});
+
+app.get('/balance', function(req, res) {
+  // var parsedUrl = url.parse(request.url, true);
+  var refererUrl = req.headers.referer;
+  var positionOfSecret = refererUrl.indexOf('/secret/');
+  var secretUriIndex = positionOfSecret + 8;
+  var secretUri = refererUrl.slice(secretUriIndex);
+  db.findAddressFromUrl(secretUri, function(err, results, fields) {
+    var btcAddress = results[0].btc_address;
+    // make a get request to HelloBlock to check balance of address
+    //'n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa' has 150000 satoshis
+    btcUtils.checkBalanceOfAddress(btcAddress, function(result) {
+      // btcUtils.checkBalanceOfAddress('n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa', function(result) {
+      console.log("this is the balance: ", result)
+      res.end(JSON.stringify(result)); //send balance to the client;
+
+      // if the balance is above 0 send a cookie that allows them access the site
+
+    })
+    //then res.send, the balance
+  });
+});
+app.get('/MyTunes-FinalVersion/*', function(req, res) {
+  // app.get('/clientScript/*', function(req, res) {
+  console.log('this is the path: ', req.path);
+  // console.log('')
+  res.sendFile(__dirname + req.path);
+  // res.end("finished sending")
+});
+
+app.get('/clientScript/*', function(req, res) {
+  console.log('this is the path: ', req.path);
+  // console.log('')
+  res.sendFile(__dirname + req.path);
+  // res.end("finished sending")
 });
 
 console.log('App is listening on 3000');
