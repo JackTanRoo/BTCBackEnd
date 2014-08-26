@@ -68,6 +68,11 @@ app.get('/address', function(req, res) {
   });
 });
 
+app.get('/decrementAccount', function(req, res) {
+  // var parsedUrl = url.parse(request.url, true);
+  res.end("decrementAccount response");
+});
+
 app.get('/balance', function(req, res) {
   // var parsedUrl = url.parse(request.url, true);
   var refererUrl = req.headers.referer;
@@ -78,7 +83,7 @@ app.get('/balance', function(req, res) {
     var btcAddress = results[0].btc_address;
     // make a get request to HelloBlock to check balance of address
     //'n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa' has 150000 satoshis
-    btcUtils.checkBalanceOfAddress(btcAddress, function(balance) {
+    btcUtils.checkBalanceOfAddress('n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa', function(balance) {
       // btcUtils.checkBalanceOfAddress('n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa', function(balance) {
       console.log("this is the balance: ", balance)
       var balanceAndSongs = {

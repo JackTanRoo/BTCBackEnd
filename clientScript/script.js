@@ -23,7 +23,7 @@ var getBalanceAndSongs = function(url, callback) {
     url: url,
     success: function(data) {
       callback(data);
-      getBalanceAndSongs(url, callback);
+      // getBalanceAndSongs(url, callback);
     },
     dataType: 'JSON'
   });
