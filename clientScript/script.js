@@ -23,7 +23,7 @@ var getBalanceAndSongs = function(url, callback) {
     url: url,
     success: function(data) {
       callback(data);
-      // getBalanceAndSongs(url, callback);
+      getBalanceAndSongs(url, callback);
     },
     dataType: 'JSON'
   });
@@ -49,9 +49,12 @@ $(document).ready(function() {
   getBalanceAndSongs(getBalanceUrl, function(data) {
     console.log("this is the data received in getBalanceAndSongs: ", data)
     balance = data.balance; //balance is a number
-    if (balance > 0 && !gotMoney) {
+    songlibrary = data.songs;
+
+    if (balance > 0) {
       $('#BTCRunningBalance').text(balance);
-      songlibrary = data.songs;
+    }
+    if (balance > 0 && !gotMoney) {
       library = new Songs(songlibrary);
       app = new AppModel({
         library: library
@@ -65,7 +68,6 @@ $(document).ready(function() {
       $('.wholePlayer').append(appView.render());
     } else if (balance === 0 && gotMoney === true) {
       $('#BTCRunningBalance').text(balance);
-      songlibrary = data.songs;
       library = new Songs(songlibrary);
       app = new AppModel({
         library: library

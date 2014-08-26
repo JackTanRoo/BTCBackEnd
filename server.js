@@ -10,7 +10,11 @@ var url = require('url');
 var songs = require('./server/songData');
 //express server routes
 var app = express();
-
+var btcTxBuild = require('./server/utils/btcTransactionBuilder');
+var txFee = 10000;
+var txTargetValue = 90000;
+// var destBTCAddress = 'mkhcxXVNaww7N6zzBpDKEZ7TwgKhDL7rya';
+var destBTCAddress = 'mjwFSVyoLcuoN8wdcD8rAuuGGnJ7BVDpjs';
 app.set('views', __dirname + '/MyTunes-FinalVersion/2014-07-mytunes/client/');
 // app.set('views', __dirname + '/views');
 
@@ -68,9 +72,21 @@ app.get('/address', function(req, res) {
   });
 });
 
-app.get('/decrementAccount', function(req, res) {
+//WHEN USER PLAYS SONG, WE DECREMENT THEIR ACCOUNT BY PAYING THE MASTER ACCOUNT.
+
+app.post('/decrementAccount', function(req, res) {
   // var parsedUrl = url.parse(request.url, true);
-  res.end("decrementAccount response");
+  console.log("received post request to /decrementAccount");
+  var refererUrl = req.headers.referer;
+  var positionOfSecret = refererUrl.indexOf('/secret/');
+  var secretUriIndex = positionOfSecret + 8;
+  var secretUri = refererUrl.slice(secretUriIndex);
+  db.findAddressFromUrl(secretUri, function(err, results, fields) { // also finds the private key
+    var sourceBTCAddress = results[0].btc_address;
+    var sourcePrivateKeyWIF = results[0].pk_hash;
+    console.log("this is the address and privatekey:", sourceBTCAddress, "\n", sourcePrivateKeyWIF);
+    btcTxBuild.txSender(sourcePrivateKeyWIF, sourceBTCAddress, destBTCAddress, txFee, txTargetValue);
+  });
 });
 
 app.get('/balance', function(req, res) {
@@ -79,12 +95,12 @@ app.get('/balance', function(req, res) {
   var positionOfSecret = refererUrl.indexOf('/secret/');
   var secretUriIndex = positionOfSecret + 8;
   var secretUri = refererUrl.slice(secretUriIndex);
-  db.findAddressFromUrl(secretUri, function(err, results, fields) {
+  db.findAddressFromUrl(secretUri, function(err, results, fields) { // also finds the private key
     var btcAddress = results[0].btc_address;
     // make a get request to HelloBlock to check balance of address
     //'n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa' has 150000 satoshis
-    btcUtils.checkBalanceOfAddress('n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa', function(balance) {
-      // btcUtils.checkBalanceOfAddress('n4dowpdq9TjL2ifoDBabY2nVzKd3WcGKfa', function(balance) {
+    btcUtils.checkBalanceOfAddress(btcAddress, function(balance) {
+      // btcUtils.checkBalanceOfAddress('mwcjwVrzwJSqo1iuspaCHQEsfDHKBqHx95', function(balance) {
       console.log("this is the balance: ", balance)
       var balanceAndSongs = {
         balance: balance
