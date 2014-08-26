@@ -40,3 +40,29 @@ exports.checkBalanceOfAddress = function(address, callback) {
     console.log('ERROR: ' + e.message);
   });
 }
+
+exports.getLatestTx = function(address, txLimit, callback) {
+  var hbTxInspectUrl = 'http://testnet.helloblock.io/v1/addresses/' + address + '/transactions?limit=' + txLimit;
+  var req = http.get(hbTxInspectUrl, function(res) {
+    console.log('STATUS: ' + res.statusCode);
+    console.log('HEADERS: ' + JSON.stringify(res.headers));
+    // Buffer the body entirely for processing as a whole.
+    // var bodyChunks = [];
+    var data = "";
+    res.on('data', function(chunk) {
+      // You can process streamed parts here...
+      // bodyChunks.push(chunk);
+      data += chunk;
+    }).on('end', function() {
+      // console.log("this is the return data: ", data)
+      var dataObject = JSON.parse(data);
+      var txArray = dataObject.data.transactions;
+
+      callback(txArray);
+      // ...and/or process the entire body here.
+    })
+  });
+  req.on('error', function(e) {
+    console.log('ERROR: ' + e.message);
+  });
+};

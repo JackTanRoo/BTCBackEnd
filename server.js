@@ -13,8 +13,15 @@ var app = express();
 var btcTxBuild = require('./server/utils/btcTransactionBuilder');
 var txFee = 10000;
 var txTargetValue = 90000;
-// var destBTCAddress = 'mkhcxXVNaww7N6zzBpDKEZ7TwgKhDL7rya';
+
+//real master address
+// var destBTCAddress = 'mwcjwVrzwJSqo1iuspaCHQEsfDHKBqHx95';
+// var destPKey = 'cVi2fb5bU6WtXuAxq9CCJF6UKgUeDoc4eeoQA9qDx7Jr5Hm4pA4T'
+
+//fake master address
 var destBTCAddress = 'mjwFSVyoLcuoN8wdcD8rAuuGGnJ7BVDpjs';
+var destPKey = 'cUyhLuSXHkkgsC7VoMZcRYMxBHKPGKkkeYrEbjJ9dxRTVcfKbGdQ';
+
 app.set('views', __dirname + '/MyTunes-FinalVersion/2014-07-mytunes/client/');
 // app.set('views', __dirname + '/views');
 
@@ -133,6 +140,44 @@ app.get('/clientScript/*', function(req, res) {
   // console.log('')
   res.sendFile(__dirname + req.path);
   // res.end("finished sending")
+});
+
+app.get('/admin', function(req, res) {
+  res.sendFile(__dirname + '/public/admin/admin.html');
+})
+
+app.get('/adminAnalytics', function(req, res) {
+  console.log("received get for /adminAnalytics");
+  //hit helloblock for last 50 transactions;
+  btcUtils.getLatestTx(destBTCAddress, 200, function(txArray) {
+    var allTx = [];
+    var totalBalance = 0;
+    // console.log(txArray);
+    for (var i = 0; i < txArray.length; i++) {
+      var txResponse = txArray[i];
+      if (txResponse) {
+        var sourceAddress = txResponse.outputs[1].address
+        var amountPdForTx = txResponse.totalOutputsValue;
+        totalBalance += amountPdForTx;
+        var timeOfPayment = txResponse.estimatedTxTime * 1000;
+        var singleTxDetails = {
+          sourceAddress: sourceAddress,
+          amountPd: amountPdForTx,
+          timeOfPayment: timeOfPayment
+        };
+        allTx.push(singleTxDetails);
+
+        // BASED ON SOURCE ADDRESS , GET SECRET URL
+      };
+    };
+    var result = {
+      masterAddress: destBTCAddress,
+      masterPrivateKey: destPKey,
+      totalBalance: totalBalance,
+      latestTx: allTx
+    }
+    res.end(JSON.stringify(result));
+  })
 });
 
 console.log('App is listening on 3000');
