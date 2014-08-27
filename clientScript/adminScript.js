@@ -36,11 +36,53 @@ $(document).ready(function() {
       var milliseconds = tx.timeOfPayment;
       // console.log("msec: ", milliseconds);
       var time = new Date(milliseconds);
+      time = time.toLocaleString();
       $('.latestTx').append('<tr><td>' + "placeholder" + '</td>' + '<td>' + address + '</td>' + '<td>' + amount + '</td>' + '<td>' + time + '</td></tr>')
     };
+    var frequencyObj = createHistogram(txArray);
+    console.log("I am the histo obj: ", frequencyObj);
+    var heightArray = [];
+    var sourceAddressArr = Object.keys(frequencyObj);
+    for (var i = 0; i < 5; i++) {
+      var eachAddress = sourceAddressArr[i];
+      heightArray.push(frequencyObj[eachAddress] * 10000);
+    };
+    console.log("height array: ", heightArray);
+    var dataArray = ['data1'].concat(heightArray);
 
-    //create a d3 histogram;
-    console.log(createHistogram(txArray));
+    // for (var i = 0; i < 5; i++) {
+    //   var columnName = sourceAddressArr[i];
+    //   $('.columnNames').append("<td>" + columnName + "</td>");
+    // }
+    // var chart = c3.generate({
+    //   bindto: '.bestCustomerGraph',
+    //   data: {
+    //     columns: [
+    //       dataArray
+    //     ],
+    //     types: {
+    //       data1: 'bar' // ADD
+    //     }
+    //   },
+    //   axis: {
+    //     x: {
+    //       label: {
+    //         text: 'BTC Addresses',
+    //         position: 'outer-middle'
+    //       }
+    //     }
+    //   }
+    // });
 
+    // create a d3 histogram;
+    d3.select('.bestCustomerGraph')
+      .selectAll('div')
+      .data(heightArray)
+      .enter()
+      .append('div')
+      .attr('class', 'bar')
+      .style("height", function(d) {
+        return d + "px";
+      });
   });
 });
