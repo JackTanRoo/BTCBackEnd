@@ -45,7 +45,7 @@ $(document).ready(function() {
     var sourceAddressArr = Object.keys(frequencyObj);
     for (var i = 0; i < 5; i++) {
       var eachAddress = sourceAddressArr[i];
-      heightArray.push(frequencyObj[eachAddress] * 10000);
+      heightArray.push(frequencyObj[eachAddress] * 6000);
     };
     console.log("height array: ", heightArray);
     var dataArray = ['data1'].concat(heightArray);
